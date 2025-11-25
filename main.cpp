@@ -82,7 +82,6 @@ void updateStudent(map<int, Student> &ds) {
     }
 
     Student &sv = ds[mssv];
-    cin.ignore();
 
     cout << "Nhap ten moi (bo trong de giu nguyen): ";
     string tmp;
@@ -99,12 +98,11 @@ void updateStudent(map<int, Student> &ds) {
     cin >> gt;
     if (gt == 0 || gt == 1) sv.gender = gt;
 
-    cin.ignore();
     cout << "Nhap Gmail moi (bo trong de giu nguyen): ";
     getline(cin, tmp);
     if (!tmp.empty()) sv.gmail = tmp;
 
-    cout << "✔ Cap nhat thanh cong!\n";
+    cout << "Cap nhat thanh cong!\n";
 }
 
 void printAll(const map<int, Student> &ds) {
