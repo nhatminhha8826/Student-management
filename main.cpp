@@ -22,7 +22,6 @@ void addStudent(map<int, Student> &ds) {
         return;
     }
 
-    cin.ignore();
     cout << "Nhap ten: ";
     getline(cin, sv.name);
 
@@ -32,12 +31,11 @@ void addStudent(map<int, Student> &ds) {
     cout << "Gioi tinh (1 = Nam, 0 = Nu): ";
     cin >> sv.gender;
 
-    cin.ignore();
     cout << "Nhap Gmail: ";
     getline(cin, sv.gmail);
 
     ds[mssv] = sv;
-    cout << "✔ Them thanh cong!\n";
+    cout << "Them thanh cong!\n";
 }
 
 void removeStudent(map<int, Student> &ds) {
