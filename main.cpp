@@ -15,7 +15,6 @@ struct Node {
     Node* next;
 };
 
-// ====== Helpers ======
 Node* findNode(Node* head, int mssv) {
     while (head) {
         if (head->mssv == mssv) return head;
@@ -24,7 +23,6 @@ Node* findNode(Node* head, int mssv) {
     return NULL;
 }
 
-// ====== CRUD Functions ======
 void addStudent(Node* &head) {
     int mssv;
     cout << "Nhap MSSV: ";
@@ -50,7 +48,6 @@ void addStudent(Node* &head) {
     cout << "Nhap Gmail: ";
     getline(cin, sv.gmail);
 
-    // Tao node theo C++ cu (khong dung new Node{...})
     Node* newNode = new Node;
     newNode->mssv = mssv;
     newNode->sv = sv;
@@ -171,7 +168,6 @@ void clearList(Node* &head) {
     }
 }
 
-// ====== Main ======
 int main() {
     Node* head = NULL;
     int choice;
