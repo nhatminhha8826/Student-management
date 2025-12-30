@@ -1,27 +1,42 @@
 #include <iostream>
-#include <map>
 #include <string>
 using namespace std;
 
 struct Student {
     string name;
     float cpa;
-    bool gender;     // true = Nam, false = Nữ
+    bool gender;   // true = Nam, false = Nu
     string gmail;
 };
 
-void addStudent(map<int, Student> &ds) {
+struct Node {
     int mssv;
     Student sv;
+    Node* next;
+};
 
+// ====== Helpers ======
+Node* findNode(Node* head, int mssv) {
+    while (head) {
+        if (head->mssv == mssv) return head;
+        head = head->next;
+    }
+    return NULL;
+}
+
+// ====== CRUD Functions ======
+void addStudent(Node* &head) {
+    int mssv;
     cout << "Nhap MSSV: ";
     cin >> mssv;
+    cin.ignore(); // xoa '\n' sau cin
 
-    if (ds.count(mssv)) {
+    if (findNode(head, mssv)) {
         cout << "MSSV da ton tai!\n";
         return;
     }
 
+    Student sv;
     cout << "Nhap ten: ";
     getline(cin, sv.name);
 
@@ -30,94 +45,135 @@ void addStudent(map<int, Student> &ds) {
 
     cout << "Gioi tinh (1 = Nam, 0 = Nu): ";
     cin >> sv.gender;
+    cin.ignore();
 
     cout << "Nhap Gmail: ";
     getline(cin, sv.gmail);
 
-    ds[mssv] = sv;
+    // Tao node theo C++ cu (khong dung new Node{...})
+    Node* newNode = new Node;
+    newNode->mssv = mssv;
+    newNode->sv = sv;
+    newNode->next = head;
+    head = newNode;
+
     cout << "Them thanh cong!\n";
 }
 
-void removeStudent(map<int, Student> &ds) {
+void removeStudent(Node* &head) {
     int mssv;
     cout << "Nhap MSSV can xoa: ";
     cin >> mssv;
 
-    if (ds.erase(mssv)) {
-        cout << "Xoa thanh cong!\n";
-    } else {
-        cout << "Khong tim thay MSSV!\n";
+    Node *cur = head, *prev = NULL;
+
+    while (cur) {
+        if (cur->mssv == mssv) {
+            if (prev) prev->next = cur->next;
+            else head = cur->next;
+
+            delete cur;
+            cout << "Xoa thanh cong!\n";
+            return;
+        }
+        prev = cur;
+        cur = cur->next;
     }
+
+    cout << "Khong tim thay MSSV!\n";
 }
 
-void findStudent(map<int, Student> &ds) {
+void findStudent(Node* head) {
     int mssv;
     cout << "Nhap MSSV can tim: ";
     cin >> mssv;
 
-    if (!ds.count(mssv)) {
+    Node* p = findNode(head, mssv);
+    if (!p) {
         cout << "Khong ton tai MSSV\n";
         return;
     }
 
-    Student sv = ds[mssv];
     cout << "\n--- THONG TIN SINH VIEN ---\n";
-    cout << "MSSV: " << mssv << "\n";
-    cout << "Ho ten: " << sv.name << "\n";
-    cout << "CPA: " << sv.cpa << "\n";
-    cout << "Gioi tinh: " << (sv.gender ? "Nam" : "Nu") << "\n";
-    cout << "Gmail: " << sv.gmail << "\n";
+    cout << "MSSV: " << p->mssv << "\n";
+    cout << "Ho ten: " << p->sv.name << "\n";
+    cout << "CPA: " << p->sv.cpa << "\n";
+    cout << "Gioi tinh: " << (p->sv.gender ? "Nam" : "Nu") << "\n";
+    cout << "Gmail: " << p->sv.gmail << "\n";
 }
 
-void updateStudent(map<int, Student> &ds) {
+void updateStudent(Node* head) {
     int mssv;
     cout << "Nhap MSSV can cap nhat: ";
     cin >> mssv;
+    cin.ignore();
 
-    if (!ds.count(mssv)) {
+    Node* p = findNode(head, mssv);
+    if (!p) {
         cout << "MSSV khong ton tai!\n";
         return;
     }
 
-    Student &sv = ds[mssv];
+    string tmp;
 
     cout << "Nhap ten moi (bo trong de giu nguyen): ";
-    string tmp;
     getline(cin, tmp);
-    if (!tmp.empty()) sv.name = tmp;
+    if (!tmp.empty()) p->sv.name = tmp;
 
     cout << "Nhap CPA moi (-1 de giu nguyen): ";
     float cpa;
     cin >> cpa;
-    if (cpa >= 0) sv.cpa = cpa;
+
+    // don '\n' de getline o duoi khong bi skip
+    cin.ignore();
+
+    if (cpa >= 0) p->sv.cpa = cpa;
 
     cout << "Nhap gioi tinh moi (1/0, -1 de giu nguyen): ";
     int gt;
     cin >> gt;
-    if (gt == 0 || gt == 1) sv.gender = gt;
+    cin.ignore();
+
+    if (gt == 0 || gt == 1) p->sv.gender = (gt == 1);
 
     cout << "Nhap Gmail moi (bo trong de giu nguyen): ";
     getline(cin, tmp);
-    if (!tmp.empty()) sv.gmail = tmp;
+    if (!tmp.empty()) p->sv.gmail = tmp;
 
     cout << "Cap nhat thanh cong!\n";
 }
 
-void printAll(const map<int, Student> &ds) {
+void printAll(Node* head) {
     cout << "\n===== DANH SACH SINH VIEN =====\n";
-    for (auto &p : ds) {
+    if (!head) {
+        cout << "(Danh sach rong)\n";
+        cout << "===============================\n";
+        return;
+    }
+
+    while (head) {
         cout << "------------------------\n";
-        cout << "MSSV: " << p.first << "\n";
-        cout << "Ho ten: " << p.second.name << "\n";
-        cout << "CPA: " << p.second.cpa << "\n";
-        cout << "Gioi tinh: " << (p.second.gender ? "Nam" : "Nu") << "\n";
-        cout << "Gmail: " << p.second.gmail << "\n";
+        cout << "MSSV: " << head->mssv << "\n";
+        cout << "Ho ten: " << head->sv.name << "\n";
+        cout << "CPA: " << head->sv.cpa << "\n";
+        cout << "Gioi tinh: " << (head->sv.gender ? "Nam" : "Nu") << "\n";
+        cout << "Gmail: " << head->sv.gmail << "\n";
+        head = head->next;
     }
     cout << "===============================\n";
 }
 
+void clearList(Node* &head) {
+    while (head) {
+        Node* tmp = head;
+        head = head->next;
+        delete tmp;
+    }
+}
+
+// ====== Main ======
 int main() {
-    map<int, Student> ds;
+    Node* head = NULL;
     int choice;
 
     while (true) {
@@ -132,13 +188,16 @@ int main() {
         cin >> choice;
 
         switch (choice) {
-            case 1: addStudent(ds); break;
-            case 2: removeStudent(ds); break;
-            case 3: findStudent(ds); break;
-            case 4: updateStudent(ds); break;
-            case 5: printAll(ds); break;
-            case 0: return 0;
-            default: cout << "Lua chon khong hop le!\n";
+            case 1: addStudent(head); break;
+            case 2: removeStudent(head); break;
+            case 3: findStudent(head); break;
+            case 4: updateStudent(head); break;
+            case 5: printAll(head); break;
+            case 0:
+                clearList(head);
+                return 0;
+            default:
+                cout << "Lua chon khong hop le!\n";
         }
     }
 }
